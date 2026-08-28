@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root.dark {
+  --bg: 206 28% 6%;            /* #0B0F14 charcoal-blue */
+  --surface: 206 22% 10%;      /* #121820 */
+  --surface-2: 206 18% 14%;    /* #1A222B */
+  --border: 206 14% 18%;       /* #1F2933 */
+  --foreground: 200 20% 94%;   /* #EAF0F5 */
+  --muted: 205 10% 58%;        /* #8B99A5 */
+  --fiat: 156 58% 52%;         /* #3DDC97 mint */
+  --fiat-foreground: 206 28% 6%;
+  --crypto: 230 100% 72%;      /* #6C8CFF indigo */
+  --crypto-foreground: 206 28% 6%;
+  --danger: 6 78% 60%;
+}
+
+:root:not(.dark) {
+  --bg: 210 25% 97%;           /* #F4F7FA */
+  --surface: 0 0% 100%;
+  --surface-2: 210 20% 95%;
+  --border: 210 16% 88%;
+  --foreground: 206 28% 10%;
+  --muted: 210 10% 40%;
+  --fiat: 156 58% 38%;
+  --fiat-foreground: 0 0% 100%;
+  --crypto: 230 70% 56%;
+  --crypto-foreground: 0 0% 100%;
+  --danger: 6 72% 48%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background: hsl(var(--bg));
+}
+
+/* Signature motif: a thin double hairline evoking twin ledger rails
+   (fiat + crypto) running side by side. Used under balances and as
+   section dividers throughout the dashboard. */
+.rail-divider {
+  height: 5px;
+  background-image:
+    linear-gradient(to right, hsl(var(--fiat) / 0.7), hsl(var(--fiat) / 0)),
+    linear-gradient(to right, hsl(var(--crypto) / 0.7), hsl(var(--crypto) / 0));
+  background-size: 60% 1px, 60% 1px;
+  background-position: top left, bottom left;
+  background-repeat: no-repeat;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+::selection {
+  background: hsl(var(--fiat) / 0.3);
+}
+
+/* Respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

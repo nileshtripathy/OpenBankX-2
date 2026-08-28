@@ -1,0 +1,77 @@
+version: "3.9"
+
+# Brings up the full OpenBankX stack (DB, cache, API, frontend) with one command:
+#   docker compose up --build
+#
+# The Solidity contracts (./contracts) aren't containerized here - deploy
+# them separately with `npx hardhat run scripts/deploy.ts --network <net>`
+# and paste the resulting addresses into backend/.env before starting.
+
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./backend/.env
+    environment:
+      # Override host-oriented values from .env with in-network service names.
+      MONGO_URI: mongodb://mongo:27017/openbankx
+      REDIS_URL: redis://redis:6379
+      CLIENT_URL: http://localhost:5173
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:5000/api/health', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost:5000/api
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  mongo_data:
+  redis_data:

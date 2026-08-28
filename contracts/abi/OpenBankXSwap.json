@@ -1,0 +1,532 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "initialOwner",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "EthMismatch",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "EthTransferFailed",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "IdenticalTokens",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InsufficientLiquidity",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnableInvalidOwner",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "OwnableUnauthorizedAccount",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "PoolExists",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "PoolNotFound",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ReentrancyGuardReentrantCall",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      }
+    ],
+    "name": "SafeERC20FailedOperation",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "amountOut",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "minAmountOut",
+        "type": "uint256"
+      }
+    ],
+    "name": "SlippageExceeded",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ZeroAmount",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "poolId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "provider",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amountA",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amountB",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "liquidityMinted",
+        "type": "uint256"
+      }
+    ],
+    "name": "LiquidityAdded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "poolId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "provider",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amountA",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amountB",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "liquidityBurned",
+        "type": "uint256"
+      }
+    ],
+    "name": "LiquidityRemoved",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "poolId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "tokenA",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "tokenB",
+        "type": "address"
+      }
+    ],
+    "name": "PoolCreated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "tokenIn",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "tokenOut",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amountIn",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amountOut",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "refId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "Swapped",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "tokenA",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "tokenB",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amountA",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amountB",
+        "type": "uint256"
+      }
+    ],
+    "name": "addLiquidity",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "liquidityMinted",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "tokenA",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "tokenB",
+        "type": "address"
+      }
+    ],
+    "name": "createPool",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "tokenIn",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "tokenOut",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amountIn",
+        "type": "uint256"
+      }
+    ],
+    "name": "getAmountOut",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "amountOut",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "liquidityOf",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "poolTokens",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "name": "pools",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "reserveA",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "reserveB",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalLiquidity",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "exists",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "tokenA",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "tokenB",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "liquidityAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "removeLiquidity",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "amountOut0",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amountOut1",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "tokenIn",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "tokenOut",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amountIn",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "minAmountOut",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "refId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "swap",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "amountOut",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
