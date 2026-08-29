@@ -1,4 +1,5 @@
 import { BankAccount, IBankAccount } from '../models/BankAccount';
+import { Types } from 'mongoose';
 import { ApiError } from '../utils/ApiError';
 import { encrypt, decrypt } from '../utils/crypto';
 import { getBankProvider } from './bankProviders';
@@ -87,6 +88,36 @@ export const BankService = {
       const accounts = await BankAccount.find({ userId }).sort({ createdAt: -1 });
       return accounts.map(sanitize);
     });
+  },
+
+  /**
+   * Aggregation pipeline: total balance per currency across all of a
+   * user's active linked accounts, plus how many accounts contribute to
+   * each. Grouping happens in Mongo rather than in JS after fetching every
+   * account, so it stays cheap as the number of linked accounts grows.
+   */
+  async getBalanceSummary(userId: string) {
+    return BankAccount.aggregate([
+      { $match: { userId: new Types.ObjectId(userId), status: 'active' } },
+      {
+        $group: {
+          _id: '$currency',
+          totalCurrentBalance: { $sum: '$currentBalance' },
+          totalAvailableBalance: { $sum: '$availableBalance' },
+          accountCount: { $sum: 1 },
+        },
+      },
+      { $sort: { totalCurrentBalance: -1 } },
+      {
+        $project: {
+          _id: 0,
+          currency: '$_id',
+          totalCurrentBalance: 1,
+          totalAvailableBalance: 1,
+          accountCount: 1,
+        },
+      },
+    ]);
   },
 
   async refreshBalances(userId: string, accountIds?: string[]) {

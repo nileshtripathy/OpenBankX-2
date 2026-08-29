@@ -29,3 +29,15 @@ export const apiRateLimiter = rateLimit({
     message: 'Too many requests, please slow down.',
   },
 });
+
+/** Stricter limit for the AI assistant - each request is a real, billed LLM call, not a cheap DB read. */
+export const aiRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: 'Too many assistant messages, please wait a few minutes and try again.',
+  },
+});

@@ -1,11 +1,21 @@
 import { Landmark } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
 import { BankAccountCard } from '@/components/bank/BankAccountCard';
 import { LinkBankDialog } from '@/components/bank/LinkBankDialog';
-import { useBankAccounts } from '@/hooks/useBank';
+import { useBankAccounts, useBalanceSummary } from '@/hooks/useBank';
+
+function formatMoney(value: number, currency: string) {
+  try {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(value);
+  } catch {
+    return `${value.toFixed(2)} ${currency}`;
+  }
+}
 
 export default function BankPage() {
   const { data: accounts, isLoading } = useBankAccounts();
+  const { data: summary } = useBalanceSummary();
 
   return (
     <div className="flex flex-col gap-6">
@@ -16,6 +26,20 @@ export default function BankPage() {
         </div>
         <LinkBankDialog />
       </div>
+
+      {/* Per-currency totals across active accounts - computed server-side via a Mongo aggregation pipeline (see bank.service.ts getBalanceSummary). */}
+      {summary && summary.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {summary.map((s) => (
+            <Badge key={s.currency} variant="fiat" className="gap-1.5 py-1.5 text-sm">
+              {formatMoney(s.totalCurrentBalance, s.currency)}
+              <span className="text-muted">
+                · {s.accountCount} account{s.accountCount === 1 ? '' : 's'}
+              </span>
+            </Badge>
+          ))}
+        </div>
+      )}
 
       {isLoading && (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

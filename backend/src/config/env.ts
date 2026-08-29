@@ -47,6 +47,22 @@ export const env = {
     googleClientId: process.env.GOOGLE_CLIENT_ID || '',
   },
 
+  ai: {
+    // The AI assistant is entirely optional: if ANTHROPIC_API_KEY is unset,
+    // the /api/ai routes return a clear 503 instead of the app failing to boot.
+    anthropicApiKey: process.env.ANTHROPIC_API_KEY || '',
+    model: process.env.AI_MODEL || 'claude-sonnet-5',
+    maxAgentSteps: Number(process.env.AI_MAX_AGENT_STEPS) || 5,
+    maxTokens: Number(process.env.AI_MAX_TOKENS) || 1024,
+    // Embeddings for the RAG knowledge base. Anthropic doesn't serve an
+    // embeddings endpoint directly - Voyage AI is the provider Anthropic
+    // recommends. Without a key, retrieval falls back to a local TF-IDF
+    // vectorizer (see ai/embeddings.ts) so the feature still works out of
+    // the box, just with cheaper (non-neural) retrieval quality.
+    voyageApiKey: process.env.VOYAGE_API_KEY || '',
+    embeddingModel: process.env.VOYAGE_EMBEDDING_MODEL || 'voyage-3-lite',
+  },
+
   plaid: {
     clientId: process.env.PLAID_CLIENT_ID || '',
     secret: process.env.PLAID_SECRET || '',

@@ -20,6 +20,10 @@ export default {
           DEFAULT: 'hsl(var(--crypto))',
           foreground: 'hsl(var(--crypto-foreground))',
         },
+        signal: {
+          DEFAULT: 'hsl(var(--signal))',
+          foreground: 'hsl(var(--signal-foreground))',
+        },
         danger: 'hsl(var(--danger))',
       },
       fontFamily: {

@@ -22,5 +22,6 @@ router.use(requireAuth);
 router.get('/balance/vault', validate(balanceQuerySchema), BlockchainController.getVaultBalance);
 router.get('/balance/wallet', validate(balanceQuerySchema), BlockchainController.getWalletBalance);
 router.get('/transactions', validate(transactionsQuerySchema), BlockchainController.listTransactions);
+router.get('/transactions/summary', BlockchainController.getTransactionsSummary);
 
 export default router;

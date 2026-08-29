@@ -10,6 +10,7 @@ const buttonVariants = cva(
       variant: {
         default: 'bg-fiat text-fiat-foreground hover:bg-fiat/90',
         crypto: 'bg-crypto text-crypto-foreground hover:bg-crypto/90',
+        signal: 'bg-signal text-signal-foreground hover:bg-signal/90',
         outline: 'border border-border bg-transparent hover:bg-surface-2 text-foreground',
         ghost: 'hover:bg-surface-2 text-foreground',
         destructive: 'bg-danger text-white hover:bg-danger/90',

@@ -98,6 +98,13 @@ async function upsertLog(
   parsed: ParsedEvent
 ): Promise<IBlockchainTransaction | null> {
   const blockTimestamp = await getBlockTimestamp(log.blockNumber);
+  const walletAddress = parsed.walletAddress.toLowerCase();
+  const counterpartyAddress = parsed.counterpartyAddress?.toLowerCase();
+  // Keep this in sync with walletAddress/counterpartyAddress above - it's
+  // what the participants index (see models/BlockchainTransaction.ts) is built on.
+  const participants = [walletAddress, counterpartyAddress].filter(
+    (addr): addr is string => Boolean(addr)
+  );
 
   const doc = await BlockchainTransaction.findOneAndUpdate(
     { txHash: log.transactionHash, logIndex: log.index },
@@ -106,8 +113,9 @@ async function upsertLog(
       logIndex: log.index,
       contractName,
       eventType: parsed.eventType,
-      walletAddress: parsed.walletAddress.toLowerCase(),
-      counterpartyAddress: parsed.counterpartyAddress?.toLowerCase(),
+      walletAddress,
+      counterpartyAddress,
+      participants,
       tokenInAddress: parsed.tokenInAddress?.toLowerCase(),
       tokenOutAddress: parsed.tokenOutAddress?.toLowerCase(),
       amountIn: parsed.amountIn,

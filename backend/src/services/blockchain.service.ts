@@ -64,9 +64,12 @@ export const BlockchainService = {
     walletAddress: string,
     opts: { page: number; limit: number; eventType?: string }
   ) {
-    const filter: Record<string, unknown> = {
-      $or: [{ walletAddress }, { counterpartyAddress: walletAddress }],
-    };
+    const wallet = walletAddress.toLowerCase();
+    // `participants` is a denormalized [walletAddress, counterpartyAddress]
+    // array kept in sync at write time (blockchainSync.service.ts), so this
+    // is a single equality match instead of an `$or` across two fields -
+    // it's fully served by the compound index defined on the model.
+    const filter: Record<string, unknown> = { participants: wallet };
     if (opts.eventType) filter.eventType = opts.eventType;
 
     const skip = (opts.page - 1) * opts.limit;
@@ -85,5 +88,45 @@ export const BlockchainService = {
       total,
       totalPages: Math.ceil(total / opts.limit),
     };
+  },
+
+  /**
+   * Aggregation pipeline: counts this wallet's on-chain activity per event
+   * type per calendar month. Deliberately counts events rather than summing
+   * `amountIn`/`amountOut` - those are raw uint256 wei values stored as
+   * strings specifically because they can exceed the range Mongo's
+   * $sum/Decimal128 can represent safely, so summing them in-pipeline would
+   * silently produce wrong numbers for large amounts.
+   */
+  async getTransactionActivitySummary(walletAddress: string) {
+    const wallet = walletAddress.toLowerCase();
+
+    return BlockchainTransaction.aggregate([
+      { $match: { participants: wallet } },
+      {
+        $group: {
+          _id: {
+            year: { $year: '$blockTimestamp' },
+            month: { $month: '$blockTimestamp' },
+            eventType: '$eventType',
+          },
+          count: { $sum: 1 },
+          firstAt: { $min: '$blockTimestamp' },
+          lastAt: { $max: '$blockTimestamp' },
+        },
+      },
+      { $sort: { '_id.year': -1, '_id.month': -1, '_id.eventType': 1 } },
+      {
+        $project: {
+          _id: 0,
+          year: '$_id.year',
+          month: '$_id.month',
+          eventType: '$_id.eventType',
+          count: 1,
+          firstAt: 1,
+          lastAt: 1,
+        },
+      },
+    ]);
   },
 };

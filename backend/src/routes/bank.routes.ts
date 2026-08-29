@@ -11,6 +11,7 @@ router.use(requireAuth); // every route in this module requires a logged-in user
 router.post('/link-token', BankController.createLinkToken);
 router.post('/exchange', validate(exchangeSchema), BankController.exchangeToken);
 router.get('/accounts', BankController.listAccounts);
+router.get('/accounts/summary', BankController.getBalanceSummary);
 router.post(
   '/accounts/:id/refresh',
   validate(accountIdParamSchema),

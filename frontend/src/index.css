@@ -13,6 +13,11 @@
   --fiat-foreground: 206 28% 6%;
   --crypto: 230 100% 72%;      /* #6C8CFF indigo */
   --crypto-foreground: 206 28% 6%;
+  /* Third rail for the AI assistant: violet, deliberately distinct from the
+     fiat/crypto pair so assistant-generated content never gets mistaken for
+     data from either ledger rail. */
+  --signal: 271 82% 72%;       /* #B084F0 violet */
+  --signal-foreground: 206 28% 6%;
   --danger: 6 78% 60%;
 }
 
@@ -27,6 +32,8 @@
   --fiat-foreground: 0 0% 100%;
   --crypto: 230 70% 56%;
   --crypto-foreground: 0 0% 100%;
+  --signal: 271 60% 52%;
+  --signal-foreground: 0 0% 100%;
   --danger: 6 72% 48%;
 }
 
@@ -51,6 +58,38 @@ body {
   background-repeat: no-repeat;
 }
 
+/* Ambient depth behind hero numbers: two soft, off-center glows in the rail
+   colors, low-opacity so it reads as atmosphere rather than decoration. */
+.ambient-glow {
+  position: relative;
+  isolation: isolate;
+}
+.ambient-glow::before {
+  content: '';
+  position: absolute;
+  inset: -40% -10% auto -10%;
+  height: 220%;
+  background:
+    radial-gradient(closest-side, hsl(var(--fiat) / 0.16), transparent),
+    radial-gradient(closest-side, hsl(var(--crypto) / 0.14), transparent 70%);
+  background-position: 15% 20%, 85% 60%;
+  background-size: 55% 55%, 60% 60%;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Cards that respond to hover with a slight lift + brighter border, used for
+   clickable/actionable cards (not applied globally - static summary cards
+   stay still). */
+.card-interactive {
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.card-interactive:hover {
+  transform: translateY(-2px);
+  border-color: hsl(var(--foreground) / 0.18);
+}
+
 .tabular-nums {
   font-variant-numeric: tabular-nums;
 }
@@ -65,5 +104,8 @@ body {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+  }
+  .card-interactive:hover {
+    transform: none;
   }
 }

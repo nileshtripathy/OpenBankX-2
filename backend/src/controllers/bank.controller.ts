@@ -25,6 +25,13 @@ export const listAccounts = asyncHandler(async (req: Request, res: Response) => 
   return ApiResponse.send(res, 200, accounts, 'Bank accounts fetched');
 });
 
+/** Aggregation-pipeline-backed per-currency totals across all linked accounts. */
+export const getBalanceSummary = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) throw ApiError.unauthorized();
+  const summary = await BankService.getBalanceSummary(req.user.userId);
+  return ApiResponse.send(res, 200, summary, 'Balance summary fetched');
+});
+
 export const refreshAccount = asyncHandler(async (req: Request, res: Response) => {
   if (!req.user) throw ApiError.unauthorized();
   const accounts = await BankService.refreshBalances(req.user.userId, [req.params.id]);

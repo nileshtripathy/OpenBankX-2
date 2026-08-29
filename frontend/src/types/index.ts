@@ -65,6 +65,22 @@ export interface PaginatedTransactions {
   totalPages: number;
 }
 
+export interface TransactionActivitySummaryEntry {
+  year: number;
+  month: number;
+  eventType: BlockchainTransaction['eventType'];
+  count: number;
+  firstAt: string;
+  lastAt: string;
+}
+
+export interface BalanceSummaryEntry {
+  currency: string;
+  totalCurrentBalance: number;
+  totalAvailableBalance: number;
+  accountCount: number;
+}
+
 export interface ApiEnvelope<T> {
   success: boolean;
   message: string;

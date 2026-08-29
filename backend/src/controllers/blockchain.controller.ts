@@ -51,6 +51,14 @@ export const listTransactions = asyncHandler(async (req: Request, res: Response)
   return ApiResponse.send(res, 200, result, 'Transactions fetched');
 });
 
+/** Aggregation-pipeline-backed monthly activity breakdown - powers the dashboard's activity chart. */
+export const getTransactionsSummary = asyncHandler(async (req: Request, res: Response) => {
+  if (!req.user) throw ApiError.unauthorized();
+  const wallet = await requireLinkedWallet(req.user.userId);
+  const summary = await BlockchainService.getTransactionActivitySummary(wallet);
+  return ApiResponse.send(res, 200, summary, 'Transaction activity summary');
+});
+
 /**
  * Server-Sent Events stream of this user's transactions as they're indexed
  * from on-chain events in real time. EventSource can't set an Authorization

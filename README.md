@@ -45,7 +45,13 @@ Comprehensive design and product documentation are available in the [`docs/`](./
    - **node-cron** scheduled jobs: periodic bank balance refresh across all linked accounts, and a blockchain-indexer lag health check.
    - **Docker**-based deployment: multi-stage builds for both services, `docker-compose.yml` for one-command local/prod-like startup. See [`DEPLOYMENT.md`](./DEPLOYMENT.md).
 
-6. **Unified Dashboard & UI**:
+6. **AI Assistant** (`/assistant`):
+   - Multi-step, tool-using agent (Claude via `@anthropic-ai/sdk`) grounded in the user's real account data - never guesses a balance, always calls a tool (`get_bank_accounts`, `get_balance_summary`, `get_vault_balance`, `get_recent_transactions`).
+   - Streams its response over Server-Sent Events, including live tool-call status, so the UI shows "Checking your vault balance..." as it happens rather than a blank wait.
+   - RAG: a small knowledge base answers "how does X work" questions, retrieved via cosine similarity - real Voyage AI embeddings if `VOYAGE_API_KEY` is set, a local TF-IDF fallback otherwise so it works out of the box.
+   - A hand-written eval set (`npm run ai:eval <email>`) checks tool selection and RAG-grounded factual correctness.
+
+7. **Unified Dashboard & UI**:
    - React 18 + Vite + TypeScript + TailwindCSS + Radix UI.
    - Real-time unified portfolio overview showing aggregate fiat balances and on-chain vault holdings.
    - Interactive deposit, withdraw, transfer, and swap modal flows with optimistic feedback.

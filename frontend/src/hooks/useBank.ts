@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
-import type { ApiEnvelope, BankAccount, LinkTokenResponse } from '@/types';
+import type { ApiEnvelope, BankAccount, LinkTokenResponse, BalanceSummaryEntry } from '@/types';
 
 export function useBankAccounts() {
   return useQuery({
@@ -63,6 +63,17 @@ export function useUnlinkBankAccount() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bank-accounts'] });
+    },
+  });
+}
+
+/** Per-currency totals across linked accounts - backed by a Mongo aggregation pipeline. */
+export function useBalanceSummary() {
+  return useQuery({
+    queryKey: ['bank-balance-summary'],
+    queryFn: async () => {
+      const res = await api.get<ApiEnvelope<BalanceSummaryEntry[]>>('/bank/accounts/summary');
+      return res.data.data;
     },
   });
 }

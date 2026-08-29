@@ -10,6 +10,7 @@ const badgeVariants = cva(
         default: 'border-transparent bg-surface-2 text-foreground',
         fiat: 'border-transparent bg-fiat/15 text-fiat',
         crypto: 'border-transparent bg-crypto/15 text-crypto',
+        signal: 'border-transparent bg-signal/15 text-signal',
         outline: 'border-border text-muted',
         danger: 'border-transparent bg-danger/15 text-danger',
       },

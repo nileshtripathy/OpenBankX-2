@@ -27,22 +27,35 @@ export default function DashboardPage() {
         <p className="text-sm text-muted">Here&apos;s your combined ledger across every rail.</p>
       </div>
 
-      <Card>
-        <CardContent className="p-6">
-          <p className="text-sm text-muted">Fiat balance (bank accounts)</p>
-          {bankLoading ? (
-            <Skeleton className="mt-2 h-10 w-48" />
-          ) : (
-            <p className="font-mono text-4xl font-semibold tabular-nums">
-              <AnimatedNumber value={totalFiat} prefix="$" />
-            </p>
-          )}
-          <div className="rail-divider mt-3 max-w-xs" />
+      <Card className="ambient-glow overflow-hidden">
+        <CardContent className="grid gap-6 p-6 sm:grid-cols-2 sm:divide-x sm:divide-border">
+          <div>
+            <p className="text-sm text-muted">Fiat balance (bank accounts)</p>
+            {bankLoading ? (
+              <Skeleton className="mt-2 h-10 w-48" />
+            ) : (
+              <p className="font-mono text-4xl font-semibold tabular-nums text-fiat">
+                <AnimatedNumber value={totalFiat} prefix="$" />
+              </p>
+            )}
+          </div>
+          <div className="sm:pl-6">
+            <p className="text-sm text-muted">Crypto balance (vault)</p>
+            {vaultEth.isLoading ? (
+              <Skeleton className="mt-2 h-10 w-40" />
+            ) : (
+              <p className="font-mono text-4xl font-semibold tabular-nums text-crypto">
+                <AnimatedNumber value={vaultEthValue} decimals={4} />{' '}
+                <span className="text-lg text-muted">ETH</span>
+              </p>
+            )}
+          </div>
         </CardContent>
+        <div className="rail-divider mx-6 mb-6" />
       </Card>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <Card>
+        <Card className="card-interactive">
           <CardHeader className="flex-row items-center gap-2 space-y-0">
             <Landmark className="h-4 w-4 text-fiat" />
             <CardTitle className="text-base">Fiat rail</CardTitle>
@@ -68,7 +81,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="card-interactive">
           <CardHeader className="flex-row items-center gap-2 space-y-0">
             <WalletIcon className="h-4 w-4 text-crypto" />
             <CardTitle className="text-base">Crypto rail</CardTitle>
